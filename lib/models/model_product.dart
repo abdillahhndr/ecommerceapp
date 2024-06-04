@@ -36,31 +36,39 @@ class ModelProduct {
 class Datum {
   String id;
   String productName;
+  String productDesc;
   String productPrice;
   String productStock;
   String productImage;
+  // String idCategory;
 
   Datum({
     required this.id,
     required this.productName,
+    required this.productDesc,
     required this.productPrice,
     required this.productStock,
     required this.productImage,
+    // required this.idCategory,
   });
 
   factory Datum.fromJson(Map<String, dynamic> json) => Datum(
         id: json["id"],
         productName: json["product_name"],
+        productDesc: json["product_desc"],
         productPrice: json["product_price"],
         productStock: json["product_stock"],
         productImage: json["product_image"],
+        // idCategory: json["id_category"],
       );
 
   Map<String, dynamic> toJson() => {
         "id": id,
         "product_name": productName,
+        "product_desc": productDesc,
         "product_price": productPrice,
         "product_stock": productStock,
         "product_image": productImage,
+        // "id_category": idCategory,
       };
 }

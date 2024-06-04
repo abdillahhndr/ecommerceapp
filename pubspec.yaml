@@ -19,7 +19,8 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.0.0+1
 
 environment:
-  sdk: '>=2.19.6 <3.0.0'
+  sdk: '>=3.2.2 <4.0.0'
+
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -36,7 +37,14 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.2
   carousel_slider: ^4.2.1
-
+  http: ^0.13.3
+  shared_preferences: ^2.2.2
+  # webview_flutter: ^3.0.4
+  flutter_local_notifications: ^13.0.0
+  intl: ^0.18.1
+  order_tracker: ^0.0.2
+  increment_decrement_form_field: ^1.0.0
+  midtrans_snap: ^1.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

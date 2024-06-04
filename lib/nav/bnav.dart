@@ -1,52 +1,16 @@
-import 'package:ecommerceapp/login.dart';
+import 'package:ecommerceapp/screens/screen_cart.dart';
 import 'package:ecommerceapp/screens/screen_category.dart';
-import 'package:ecommerceapp/screens/screen_home.dart';
 import 'package:ecommerceapp/screens/screen_listfav.dart';
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(const MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        // primarySwatch: Colors.blue,
-        // visualDensity: VisualDensity.adaptivePlatformDensity,
-        // fontFamily: 'Poppins',
-        // textTheme: const TextTheme(),
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.black,
-            foregroundColor: Colors.white,
-          ),
-        ),
-        appBarTheme: const AppBarTheme(
-          titleTextStyle: TextStyle(color: Colors.white, fontSize: 22),
-          backgroundColor: Color(0xff5B4E3B),
-          iconTheme: IconThemeData(color: Colors.white),
-        ),
-      ),
-      home: const PageLogin(),
-    );
-  }
-}
-
-class PageHome extends StatefulWidget {
-  const PageHome({Key? key}) : super(key: key);
+class PageHomecat extends StatefulWidget {
+  const PageHomecat({Key? key}) : super(key: key);
 
   @override
-  State<PageHome> createState() => _PageHomeState();
+  State<PageHomecat> createState() => _PageHomecatState();
 }
 
-class _PageHomeState extends State<PageHome>
+class _PageHomecatState extends State<PageHomecat>
     with SingleTickerProviderStateMixin {
   late TabController tabController;
   int _selectedIndex = 0;
@@ -75,7 +39,7 @@ class _PageHomeState extends State<PageHome>
       body: TabBarView(
         controller: tabController,
         children: const [
-          HomePage(),
+          CategoryPage(),
           ListFavorite(),
           // Galery(),
           // PageListSejarah(),

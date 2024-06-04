@@ -1,7 +1,19 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:ecommerceapp/main.dart';
+import 'package:ecommerceapp/models/model_add.dart';
+import 'package:ecommerceapp/models/model_product.dart';
+import 'package:ecommerceapp/nav/bnav.dart';
+import 'package:ecommerceapp/screens/screen_cart.dart';
+import 'package:ecommerceapp/screens/screen_detailproduct.dart';
+import 'package:ecommerceapp/screens/screen_listproduct.dart';
+import 'package:ecommerceapp/screens/screen_tracking.dart';
+import 'package:ecommerceapp/utils/url.dart';
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:http/http.dart' as http;
+import 'package:intl/intl.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({Key? key}) : super(key: key);
@@ -11,9 +23,102 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool isLoading = false;
+  String? id, username;
+  String? serverMessage;
+
+  final priceFormatter = NumberFormat.currency(locale: 'id_ID', symbol: 'Rp.');
+  Future getSession() async {
+    SharedPreferences pref = await SharedPreferences.getInstance();
+    setState(() {
+      id = pref.getString("id") ?? '';
+      username = pref.getString("username") ?? '';
+      print('id $id');
+    });
+  }
+
   final List<String> imageList2 = [
     'assets/images/banner1.png',
   ];
+  late List<Datum> _allProducts = [];
+  Future<List<Datum>?> getProduct() async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+      http.Response res = await http.get(Uri.parse('$url/getlistproduct.php'));
+      List<Datum> data = modelProductFromJson(res.body).data ?? [];
+      setState(() {
+        _allProducts = data;
+      });
+    } catch (e) {
+      setState(() {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('data belum ada')));
+      });
+    }
+  }
+
+  Future<ModelAddjms?> addfav(String? idp, String? idu) async {
+    try {
+      setState(() {
+        isLoading = true;
+      });
+
+      http.Response res = await http.post(Uri.parse('$url/addfav.php'), body: {
+        "id_product": idp,
+        "id_user": idu,
+      });
+      ModelAddjms data = modelAddjmsFromJson(res.body);
+      //cek kondisi (ini berdasarkan value respon api
+      //value 2 (email sudah terdaftar),1 (berhasil),dan 0 (gagal)
+      if (data.isSuccess == true) {
+        setState(() {
+          isLoading = false;
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('${data.message}')));
+          //pindah ke page login
+          Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (context) => const PageHome()),
+              (route) => false);
+        });
+      } else if (data.isSuccess == false) {
+        setState(() {
+          isLoading = false;
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('${data.message}')));
+          setState(() {
+            serverMessage = data.message;
+          });
+        });
+      } else {
+        setState(() {
+          isLoading = false;
+          ScaffoldMessenger.of(context)
+              .showSnackBar(SnackBar(content: Text('${data.message}')));
+          setState(() {
+            serverMessage = data.message;
+          });
+        });
+      }
+    } catch (e) {
+      //munculkan error
+      setState(() {
+        isLoading = false;
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text(e.toString())));
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    getProduct();
+    getSession();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -34,29 +139,53 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             title: Text(
-              'Hi, Brad\nLet\'s Go Shopping',
+              'Hi, $username\nLet\'s Go Shopping',
               style: TextStyle(color: Colors.white, fontSize: 14),
             ),
             actions: [
               Padding(
-                padding: const EdgeInsets.only(right: 10),
+                padding: const EdgeInsets.only(right: 5),
                 child: IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(context,
+                        MaterialPageRoute(builder: (context) => ListProduct()));
+                  },
                   icon: Icon(
                     Icons.search,
                     color: Colors.black,
-                    size: 48,
+                    size: 35,
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(right: 5),
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => ShoppingCart()));
+                  },
+                  icon: Icon(
+                    Icons.trolley,
+                    color: Colors.black,
+                    size: 35,
                   ),
                 ),
               ),
               Padding(
                 padding: const EdgeInsets.only(right: 20),
                 child: IconButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => TrackingPage()));
+                  },
                   icon: Icon(
                     Icons.notifications,
                     color: Colors.black,
-                    size: 48,
+                    size: 35,
                   ),
                 ),
               ),
@@ -71,23 +200,50 @@ class _HomePageState extends State<HomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SizedBox(
-                height: 40,
+                height: 20,
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   TextButton(
                     onPressed: () {},
-                    child: Text(
-                      'Home',
-                      style: TextStyle(color: Color(0xff5B4E3B), fontSize: 18),
+                    child: Stack(
+                      children: [
+                        Text(
+                          'Home',
+                          style: TextStyle(
+                            color: Color(0xff5B4E3B),
+                            fontSize: 18,
+                          ),
+                        ),
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom:
+                              -1, // Adjust this value to change the distance
+                          child: Container(
+                            color: Colors.brown,
+                            height: 2,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                   SizedBox(
-                    width: 10,
+                    width: 30,
                   ),
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation1, animation2) =>
+                              PageHomecat(),
+                          transitionDuration: Duration.zero,
+                          reverseTransitionDuration: Duration.zero,
+                        ),
+                      );
+                    },
                     child: Text(
                       'Category',
                       style: TextStyle(color: Color(0xff5B4E3B), fontSize: 18),
@@ -103,7 +259,7 @@ class _HomePageState extends State<HomePage> {
                         width: MediaQuery.of(context).size.width,
                         margin: const EdgeInsets.symmetric(horizontal: 5.0),
                         decoration: BoxDecoration(
-                          color: Colors.white30,
+                          color: Color(0xffFCEFE7),
                           borderRadius: BorderRadius.circular(8.0),
                           image: DecorationImage(
                             image: AssetImage(item),
@@ -130,6 +286,7 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text(
                     'New Arrivals 🔥',
@@ -139,88 +296,121 @@ class _HomePageState extends State<HomePage> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
+                  TextButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          PageRouteBuilder(
+                            pageBuilder: (context, animation1, animation2) =>
+                                ListProduct(),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        'See All',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Color(0xff5B4E3B),
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )),
                 ],
               ),
-              // height: 500,
-              GridView.count(
+              SizedBox(
+                height: 10,
+              ),
+              GridView.builder(
                 physics: NeverScrollableScrollPhysics(),
                 shrinkWrap: true,
-                crossAxisCount: 2,
-                children: [
-                  ProductCard(
-                    title: 'SKMEI 1311',
-                    description: 'Quartz',
-                    price: '160.00',
-                    image: 'assets/images/watch8.jpg',
-                  ),
-                  ProductCard(
-                    title: 'Quartz Ladies',
-                    description: 'POEDAGAR',
-                    price: '287.00',
-                    image: 'assets/images/watch9.jpg',
-                  ),
-                ],
+                itemCount: _allProducts.take(4).length,
+                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 10.0,
+                  mainAxisSpacing: 10.0,
+                  childAspectRatio: 0.7, // Adjust the aspect ratio as needed
+                ),
+                itemBuilder: (context, index) {
+                  Datum? data = _allProducts[index];
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        PageRouteBuilder(
+                          pageBuilder: (context, animation1, animation2) =>
+                              DetailProduct(data),
+                        ),
+                      );
+                    },
+                    child: Stack(
+                      children: <Widget>[
+                        GridTile(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              ClipRRect(
+                                borderRadius: BorderRadius.vertical(
+                                  bottom: Radius.circular(20.0),
+                                  top: Radius.circular(20.0),
+                                ),
+                                child: Image.network(
+                                  '$url/image/${data?.productImage}',
+                                  height: 134,
+                                  width: 130,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                              SizedBox(height: 16),
+                              Text(
+                                '${data?.productName}',
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              SizedBox(height: 8),
+                              Flexible(
+                                child: Text(
+                                  '${data?.productDesc}',
+                                  style: TextStyle(
+                                    fontSize: 14,
+                                  ),
+                                  maxLines: 2,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Text(
+                                priceFormatter
+                                    .format(double.parse(data.productPrice)),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: 22),
+                            ],
+                          ),
+                        ),
+                        Positioned(
+                          top: 8.0,
+                          right: 8.0,
+                          child: IconButton(
+                            icon: Icon(Icons.favorite),
+                            onPressed: () {
+                              addfav(data.id, id);
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                },
               ),
             ],
           ),
         ),
-      ),
-    );
-  }
-}
-
-class ProductCard extends StatelessWidget {
-  final String title;
-  final String description;
-  final String price;
-  final String image;
-
-  const ProductCard({
-    Key? key,
-    required this.title,
-    required this.description,
-    required this.price,
-    required this.image,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: EdgeInsets.all(16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.vertical(
-              bottom: Radius.circular(20.0),
-              top: Radius.circular(20.0),
-            ),
-            child: Image.asset(image),
-          ),
-          SizedBox(height: 16),
-          Text(
-            title,
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 18,
-            ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            description,
-            style: TextStyle(
-              fontSize: 14,
-            ),
-          ),
-          SizedBox(height: 8),
-          Text(
-            '\$$price',
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
       ),
     );
   }
