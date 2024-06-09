@@ -163,7 +163,7 @@ class _ShoppingCartState extends State<ShoppingCart> {
                           ),
                         ),
                         IncrementDecrementFormField<int>(
-                          initialValue: _quantities[data.id] ?? 1,
+                          initialValue: 1,
                           displayBuilder: (value, field) {
                             return Text(
                               value == null ? "0" : value.toString(),

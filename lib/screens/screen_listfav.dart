@@ -47,7 +47,7 @@ class _ListFavoriteState extends State<ListFavorite> {
     } catch (e) {
       setState(() {
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text(e.toString())));
+            .showSnackBar(SnackBar(content: Text('Anda belum like apapun')));
       });
     }
   }

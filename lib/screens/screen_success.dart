@@ -1,11 +1,27 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:ecommerceapp/main.dart';
 import 'package:ecommerceapp/models/model_add.dart';
+import 'package:ecommerceapp/screens/noti.dart';
 import 'package:ecommerceapp/utils/url.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
+// import 'package:path_provider/path_provider.dart';
+
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
+// int id = 0;
+
+// final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+//     FlutterLocalNotificationsPlugin();
+
+/// Streams are created so that app can respond to notification-related events
+/// since the plugin is initialised in the `main` function
+// final StreamController<ReceivedNotification> didReceiveLocalNotificationStream =
+//     StreamController<ReceivedNotification>.broadcast();
 
 class SuccessPage extends StatefulWidget {
   final int? orderId;
@@ -49,6 +65,25 @@ class _SuccessPageState extends State<SuccessPage> {
     } catch (error) {
       print('Error deleting data: $error');
     }
+  }
+
+  Future<void> showNotification() async {
+    var androidPlatformChannelSpecifics = AndroidNotificationDetails(
+        'ecommerce1', 'channel_name',
+        icon: '@mipmap/ic_launcher',
+        importance: Importance.max,
+        priority: Priority.high,
+        ticker: 'ticker');
+    var platformChannelSpecifics =
+        NotificationDetails(android: androidPlatformChannelSpecifics);
+
+    await flutterLocalNotificationsPlugin.show(
+      0,
+      'Notification Title',
+      'Notification Body',
+      platformChannelSpecifics,
+      payload: 'item x',
+    );
   }
 
   Future<ModelAddjms?> update() async {
@@ -95,8 +130,12 @@ class _SuccessPageState extends State<SuccessPage> {
     // getProduct();
     getSession();
     // update();
+    Noti.init();
     super.initState();
+    // Noti.initialize(flutterLocalNotificationsPlugin);
   }
+
+  Noti noti = Noti();
 
   @override
   Widget build(BuildContext context) {
@@ -107,7 +146,16 @@ class _SuccessPageState extends State<SuccessPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             ElevatedButton(
-                onPressed: () async {
+                onPressed: () {
+                  // _showNotificationWithTextAction();
+                  // showNotification();
+                  // noti.pushNotification
+                  Noti.pushNotification(
+                      title: '$username ', body: 'pembayaran berhasil');
+                  // Noti.showBigTextNotification(
+                  //     title: 'Payments',
+                  //     body: 'Prosespembayaran berhasil',
+                  //     fln: flutterLocalNotificationsPlugin);
                   update();
                 },
                 child: Text('Back to Home')),

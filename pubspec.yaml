@@ -45,6 +45,13 @@ dependencies:
   order_tracker: ^0.0.2
   increment_decrement_form_field: ^1.0.0
   midtrans_snap: ^1.0.0
+  progress_tracker: ^0.0.7
+  smooth_page_indicator: ^1.1.0
+
+  # firebase_core: ^2.27.0
+  # firebase_core: ^2.27.0
+  # firebase_messaging: ^14.7.19
+  # firebase_core: ^2.27.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

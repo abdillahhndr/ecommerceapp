@@ -1,33 +1,45 @@
+import 'package:ecommerceapp/models/model_historypayment.dart';
 import 'package:flutter/material.dart';
 import 'package:order_tracker/order_tracker.dart';
 
 class TrackingPage extends StatefulWidget {
-  const TrackingPage({super.key});
+  final Datum data;
+  const TrackingPage(this.data, {super.key});
 
   @override
   State<TrackingPage> createState() => _TrackingPageState();
 }
 
 class _TrackingPageState extends State<TrackingPage> {
-  List<TextDto> orderList = [
-    TextDto("Your order has been placed", "Fri, 25th Mar '22 - 10:47pm"),
-    TextDto("Seller ha processed your order", "Sun, 27th Mar '22 - 10:19am"),
-    TextDto("Your item has been picked up by courier partner.",
-        "Tue, 29th Mar '22 - 5:00pm"),
-  ];
+  int _currentStep = 0;
+  // List<Tracking> _trackingData = [];
+  bool _isLoading = true;
 
-  List<TextDto> shippedList = [
-    TextDto("Your order has been shipped", "Tue, 29th Mar '22 - 5:04pm"),
-    TextDto("Your item has been received in the nearest hub to you.", null),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    // Load your tracking data here if needed
+  }
 
-  List<TextDto> outOfDeliveryList = [
-    TextDto("Your order is out for delivery", "Thu, 31th Mar '22 - 2:27pm"),
-  ];
-
-  List<TextDto> deliveredList = [
-    TextDto("Your order has been delivered", "Thu, 31th Mar '22 - 3:58pm"),
-  ];
+  List<Step> _buildSteps() {
+    return [
+      Step(
+        title: Text("Alamat Toko"),
+        subtitle: Text("jakarta"),
+        content: Container(),
+        isActive: _currentStep >= 0,
+        state: _currentStep > 0 ? StepState.complete : StepState.indexed,
+      ),
+      Step(
+        title: Text("Alamat Rumah"),
+        subtitle: Text(widget.data.customerAddress),
+        content: Container(),
+        isActive: _currentStep >= 1,
+        state: _currentStep > 1 ? StepState.complete : StepState.indexed,
+      ),
+      // Add more steps here if you have more tracking data
+    ];
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -54,26 +66,49 @@ class _TrackingPageState extends State<TrackingPage> {
           ),
         ),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Card(
-          elevation: 2,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: OrderTracker(
-              status: Status.delivered,
-              activeColor: Colors.green,
-              inActiveColor: Colors.grey[300],
-              orderTitleAndDateList: orderList,
-              shippedTitleAndDateList: shippedList,
-              outOfDeliveryTitleAndDateList: outOfDeliveryList,
-              deliveredTitleAndDateList: deliveredList,
+      body: Column(
+        children: [
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Stepper(
+                      controlsBuilder:
+                          (BuildContext context, ControlsDetails controls) {
+                        return Container();
+                      },
+                      currentStep: _currentStep,
+                      onStepTapped: (step) {
+                        setState(() {
+                          _currentStep = step;
+                        });
+                      },
+                      steps: _buildSteps(),
+                      type: StepperType.vertical,
+                    ),
+                  ),
+                  // SizedBox(
+                  //   width: double.infinity,
+                  //   child: ElevatedButton(
+                  //     onPressed: () {
+                  //       Navigator.pop(context);
+                  //     },
+                  //     child: Text(
+                  //       'Mark as Done',
+                  //       style: TextStyle(color: Colors.white),
+                  //     ),
+                  //     style: ElevatedButton.styleFrom(
+                  //       backgroundColor: Colors.green,
+                  //     ),
+                  //   ),
+                  // ),
+                ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }

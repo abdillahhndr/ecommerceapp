@@ -177,10 +177,10 @@ class _HomePageState extends State<HomePage> {
                 padding: const EdgeInsets.only(right: 20),
                 child: IconButton(
                   onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => TrackingPage()));
+                    // Navigator.push(
+                    //     context,
+                    //     MaterialPageRoute(
+                    //         builder: (context) => TrackingPage()));
                   },
                   icon: Icon(
                     Icons.notifications,
@@ -397,7 +397,7 @@ class _HomePageState extends State<HomePage> {
                           top: 8.0,
                           right: 8.0,
                           child: IconButton(
-                            icon: Icon(Icons.favorite),
+                            icon: Icon(Icons.favorite_border),
                             onPressed: () {
                               addfav(data.id, id);
                             },

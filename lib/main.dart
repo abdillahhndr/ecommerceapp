@@ -1,11 +1,33 @@
+// import 'package:ecommerceapp/api/firebase_api.dart';
 import 'package:ecommerceapp/login.dart';
+import 'package:ecommerceapp/screen_irfan/profile_screen.dart';
+import 'package:ecommerceapp/screen_irfan/splash_screen.dart';
+import 'package:ecommerceapp/screens/noti.dart';
 import 'package:ecommerceapp/screens/screen_category.dart';
 import 'package:ecommerceapp/screens/screen_home.dart';
 import 'package:ecommerceapp/screens/screen_listfav.dart';
+import 'package:ecommerceapp/screens/screen_paymentshistory.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+    FlutterLocalNotificationsPlugin();
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // await Firebase.initializeApp();
+  // await FirebaseApi().initNotification();
+  // final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+  //     FlutterLocalNotificationsPlugin();
+  // final AndroidInitializationSettings initializationSettingsAndroid =
+  //     AndroidInitializationSettings('@mipmap/lc_launcher');
+  // final InitializationSettings initializationSettings =
+  //     InitializationSettings(android: initializationSettingsAndroid);
+  // await flutterLocalNotificationsPlugin.initialize(initializationSettings);
+  Noti.init();
   runApp(const MyApp());
+
+  // Noti.initialize(flutterLocalNotificationsPlugin);
 }
 
 class MyApp extends StatelessWidget {
@@ -34,7 +56,7 @@ class MyApp extends StatelessWidget {
           iconTheme: IconThemeData(color: Colors.white),
         ),
       ),
-      home: const PageLogin(),
+      home: const SplashScreen(),
     );
   }
 }
@@ -54,7 +76,7 @@ class _PageHomeState extends State<PageHome>
   @override
   void initState() {
     super.initState();
-    tabController = TabController(length: 3, vsync: this);
+    tabController = TabController(length: 4, vsync: this);
     tabController.addListener(() {
       setState(() {
         _selectedIndex = tabController.index;
@@ -77,7 +99,8 @@ class _PageHomeState extends State<PageHome>
         children: const [
           HomePage(),
           ListFavorite(),
-          // Galery(),
+          ListHistory(),
+          ProfileScreen(),
           // PageListSejarah(),
         ],
       ),
@@ -88,7 +111,7 @@ class _PageHomeState extends State<PageHome>
           children: [
             _buildNavItem(0, Icons.home),
             _buildNavItem(1, Icons.favorite),
-            _buildNavItem(2, Icons.chat_rounded),
+            _buildNavItem(2, Icons.attach_money),
             _buildNavItem(3, Icons.person),
           ],
         ),

@@ -1,6 +1,7 @@
 import 'package:ecommerceapp/screens/screen_cart.dart';
 import 'package:ecommerceapp/screens/screen_category.dart';
 import 'package:ecommerceapp/screens/screen_listfav.dart';
+import 'package:ecommerceapp/screens/screen_paymentshistory.dart';
 import 'package:flutter/material.dart';
 
 class PageHomecat extends StatefulWidget {
@@ -41,6 +42,7 @@ class _PageHomecatState extends State<PageHomecat>
         children: const [
           CategoryPage(),
           ListFavorite(),
+          ListHistory(),
           // Galery(),
           // PageListSejarah(),
         ],
@@ -52,7 +54,7 @@ class _PageHomecatState extends State<PageHomecat>
           children: [
             _buildNavItem(0, Icons.home),
             _buildNavItem(1, Icons.favorite),
-            _buildNavItem(2, Icons.chat_rounded),
+            _buildNavItem(2, Icons.attach_money),
             _buildNavItem(3, Icons.person),
           ],
         ),

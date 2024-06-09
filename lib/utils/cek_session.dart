@@ -2,33 +2,28 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class SessionManager {
   int? value;
-  String? idUser, userName, email, address;
+  String? idUser, username, email, address; // Add address field
 
   Future<void> saveSession(
-      int val, String id, String userName, String email, String address) async {
+      int val, String id, String username, String email, String address) async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.setInt("value", val);
     pref.setString("id", id);
-    pref.setString("username", userName);
+    pref.setString("username", username);
     pref.setString("email", email);
-    pref.setString("address", address);
+    pref.setString("address", address); // Save the address
   }
 
   Future getSession() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
-    pref.getInt("value");
-    pref.getString("id");
-    pref.getString("username");
+    value = pref.getInt("value");
+    idUser = pref.getString("id");
+    username = pref.getString("username");
+    email = pref.getString("email");
+    address = pref.getString("address"); // Retrieve the address
     return value;
   }
 
-  Future getSesiIdUser() async {
-    SharedPreferences pref = await SharedPreferences.getInstance();
-    pref.getString("id");
-    return idUser;
-  }
-
-  //clear session --> logout
   Future clearSession() async {
     SharedPreferences pref = await SharedPreferences.getInstance();
     pref.clear();
